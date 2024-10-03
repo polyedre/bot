@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-
 import json
 import random
 from flask import Flask
@@ -37,10 +36,6 @@ NOTHING = Button(name="NOTHING" ,string="000000000000")
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
 
-def split(a, n):
-    k, m = divmod(len(a), n)
-    return (a[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n))
-
 class Player:
 
     def __init__(self):
@@ -70,31 +65,18 @@ class Player:
         self.queue.append([action])
 
     def get_action(self) -> list[Button]:
-        if not self.queue:
-            # Boule de feu
-            fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X] # + [NOTHING] * 39
-            balayette = [DOWN ^ R] * 10 # + [ DOWN ] * 11
-            punch = [Y] # + [NOTHING] * 18
-            low_punch = [DOWN ^ L] # + [NOTHING] * 24
+        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
+        balayette = [DOWN ^ R] + [NOTHING] * 4
+        # punch = [Y]
+        # low_punch = [DOWN ^ L]
 
-            action = []
+        action = []
 
-            for _ in range(5):
-                rand = random.random()
+        action += fireball * 36 + balayette * 18
 
-                if rand < 1:
-                    action += balayette
-                elif 0.2 > rand > 0.8:
-                    action += fireball
-                elif 0.8 > rand > 0.9:
-                    action += low_punch
-                else:
-                    action += punch
-
-            for frames in split(action, 7):
-                self.queue.append(frames)
-
-            print(self.queue)
+        while len(action) > 10:
+            self.queue.append(action[:10])
+            action = action[10:]
 
         return self.queue.pop(0)
 
@@ -103,23 +85,6 @@ player = Player()
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-    )
-
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
-
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
 
     # a simple page that says hello
     @app.post('/start')
