@@ -81,11 +81,19 @@ class Player:
             # self.push(NOTHING)
 
             # Boule de feu
-            self.queue.append([DOWN, DOWN ^ RIGHT, RIGHT ^ X])
-            self.push(NOTHING)
-            self.push(NOTHING)
-            self.push(NOTHING)
-            self.push(NOTHING)
+            for _ in range(5):
+                self.queue.append([DOWN, DOWN ^ RIGHT, RIGHT ^ X])
+                self.push(NOTHING)
+                self.push(NOTHING)
+                self.push(NOTHING)
+                self.push(NOTHING)
+
+            # Balayaette
+            for _ in range(4):
+                self.queue.append([DOWN ^ R] * 10)
+                self.queue.append([DOWN ^ R] * 10)
+                self.queue.append([DOWN ^ R] * 10)
+                self.queue.append([DOWN ^ R] * 10)
 
             print(self.queue)
 
