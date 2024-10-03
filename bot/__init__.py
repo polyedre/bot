@@ -72,22 +72,27 @@ class Player:
     def get_action(self) -> list[Button]:
         if not self.queue:
             # Boule de feu
-            if self.position == "P2":
-                for _ in range(5):
-                    self.queue.append([DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X])
-                    self.push(NOTHING)
-                    self.push(NOTHING)
-                    self.push(NOTHING)
-                    self.push(NOTHING)
+            fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X] # + [NOTHING] * 39
+            balayette = [DOWN ^ R] * 10 # + [ DOWN ] * 11
+            punch = [Y] # + [NOTHING] * 18
+            low_punch = [DOWN ^ L] # + [NOTHING] * 24
 
-            # Balayaette
-            if self.position == "P1":
-                cycle = [DOWN ^ R] * 10 + [ DOWN ] * 11
+            action = []
 
-                action = cycle * 3
+            for _ in range(5):
+                rand = random.random()
 
-                for frames in split(action, 7):
-                    self.queue.append(frames)
+                if rand < 1:
+                    action += balayette
+                elif 0.2 > rand > 0.8:
+                    action += fireball
+                elif 0.8 > rand > 0.9:
+                    action += low_punch
+                else:
+                    action += punch
+
+            for frames in split(action, 7):
+                self.queue.append(frames)
 
             print(self.queue)
 
