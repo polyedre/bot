@@ -6,6 +6,8 @@ import random
 from flask import Flask
 from flask import request
 
+game=os.environ.get("GAME", "SF")
+
 class Button:
 
     def __init__(self, name, string):
@@ -31,7 +33,7 @@ A       = Button(name="A"       ,string="000000001000")
 X       = Button(name="X"       ,string="000000000100")
 L       = Button(name="L"       ,string="000000000010")
 R       = Button(name="R"       ,string="000000000001")
-NOTHING = Button(name="NOTHING" ,string="000000000000")
+NOTHING = Button(name="_" ,string="000000000000")
 
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
@@ -44,43 +46,59 @@ class Player:
 
     def set_position(self, position):
         self.position = position
-        self.dhalsim()
+        self.select_player()
 
-    def dhalsim(self):
+    def frame(self, moves):
+        if type(moves)!=list:
+            moves = [moves]
+        nothing_fill_count = 10 - len(moves)
+        self.queue.extend(moves + [NOTHING] * nothing_fill_count)
+
+    def select_player(self):
         # Let's select DHALSIM
         if self.position == "P1":
-            self.push(DOWN)
+            self.frame(DOWN)
 
-        self.push(RIGHT)
-        self.push(RIGHT)
-        self.push(RIGHT)
-        self.push(A)
+        self.frame(RIGHT)
+        self.frame(RIGHT)
+        self.frame(RIGHT)
+        self.frame(A)
 
     def get_direction(self):
         if self.position == "P1":
             return RIGHT
         return LEFT
 
-    def push(self, action: Button) -> None:
-        self.queue.append([action])
+    def get_actions(self) -> list[Button]:
+        if len(self.queue) < 10:
+            actions = self.plan_actions()
+            self.queue += actions
 
-    def get_action(self) -> list[Button]:
-        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
+        actions = self.queue[:10]
+        self.queue = self.queue[10:]
+        return actions
+
+    def plan_actions(self):
+        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ Y]  + [NOTHING] * 2
         balayette = [DOWN ^ R] + [NOTHING] * 4
-        # punch = [Y]
-        # low_punch = [DOWN ^ L]
+        return fireball * 36 + balayette * 18
 
-        action = []
+class PQuestPlayer(Player):
 
-        action += fireball * 36 + balayette * 18
+    def __init__(self):
+        super(Player, self).__init__()
 
-        while len(action) > 10:
-            self.queue.append(action[:10])
-            action = action[10:]
+    def select_player(self):
+        pass
 
-        return self.queue.pop(0)
+    def plan_actions(self):
+        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ A]  + [NOTHING] * 2
+        # balayette = [DOWN ^ R] + [NOTHING] * 4
+        return fireball * 36
 
 player = Player()
+
+print(f"THE GAME IS {game}")
 
 def create_app(test_config=None):
     # create and configure the app
@@ -109,8 +127,7 @@ def create_app(test_config=None):
         player_clock = request.headers.get("X-Player-Clock", 0)
         player_timeout = request.headers.get("X-Player-Timeout", 0)
 
-        actions = player.get_action()
-        print(actions)
+        actions = player.get_actions()
         str_actions = ", ".join([a.name for a in actions])
         print(f"ID: {frameid}, Count: {frame_count}, clock: {player_clock}, timeout: {player_timeout}, action: {str_actions}")
 

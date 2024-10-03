@@ -1,10 +1,14 @@
 FROM python
 
+ARG GAME="SF"
+
 WORKDIR /app
 
 ADD requirements.txt .
 
 RUN pip install -r requirements.txt
+
+ENV GAME=$GAME
 
 ADD bot bot
 
