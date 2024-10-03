@@ -92,10 +92,9 @@ class Player:
             # Balayaette
             if self.position == "P1":
                 for _ in range(4):
-                    self.queue.append([DOWN ^ R] * 10)
-                    self.queue.append([DOWN ^ R] * 10)
-                    self.queue.append([DOWN ^ R] * 10)
-                    self.queue.append([DOWN ^ R] * 10)
+                    self.queue.append([DOWN ^ R] + [ DOWN ] * 9)
+                    self.queue.append([DOWN] * 10)
+                    self.queue.append([DOWN] * 3)
 
             print(self.queue)
 
