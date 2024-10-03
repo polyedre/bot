@@ -85,7 +85,7 @@ class Player:
 class PQuestPlayer(Player):
 
     def __init__(self):
-        super(Player, self).__init__()
+        super(PQuestPlayer, self).__init__()
 
     def select_player(self):
         # Let's select MAX
@@ -117,8 +117,8 @@ def create_app(test_config=None):
                 print(f"Setting position {position}")
                 player.set_position(position)
             game_id = data.get("game_id", None)
-        except:
-            return "blabla"
+        except Exception as e:
+            return e
         return f"I start with position {position}, game is {game}, game id {game_id}"
 
     @app.post('/frame/<frameid>')
