@@ -42,7 +42,10 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.post('/start')
     def start():
-        return 'Hello, World!'
+        data = request.json
+        position = data.get("position", None)
+        game_id = data.get("game_id", None)
+        return f"I start with position {position}, game id {game_id}"
 
     @app.post('/frame/<frameid>')
     def frame(frameid: int):

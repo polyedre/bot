@@ -1,6 +1,6 @@
 FROM python
 
-ADD main.py main.py
+ADD main.py requirements.txt .
 
 RUN pip install -r requirements.txt
 
