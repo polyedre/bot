@@ -56,16 +56,23 @@ class Player:
         # Let's select DHALSIM
         if self.position == "P1":
             self.frame(DOWN)
+        # need to test KEN NOW
+        #     self.frame(A)
 
-        self.frame(RIGHT)
-        self.frame(RIGHT)
-        self.frame(RIGHT)
+        # self.frame(RIGHT)
+        # self.frame(RIGHT)
+        # self.frame(RIGHT)
         self.frame(A)
 
-    def get_direction(self):
+    def go_forward(self):
         if self.position == "P1":
             return RIGHT
         return LEFT
+
+    def go_backward(self):
+        if self.position == "P1":
+            return LEFT
+        return RIGHT
 
     def get_actions(self) -> list[Button]:
         if len(self.queue) < 10:
@@ -77,10 +84,13 @@ class Player:
         return actions
 
     def plan_actions(self):
-        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
-        balayette = [DOWN ^ R] + [NOTHING] * 4
-        drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
-        return fireball * 36 + drill * 4 + balayette * 18
+        fireball = [DOWN, DOWN ^ self.go_forward(), self.go_forward() ^ X]  + [NOTHING] * 2
+        # balayette = [DOWN ^ R] + [NOTHING] * 4
+        # drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
+        low_guard = [DOWN ^ self.go_forward()] * 10
+        high_guard = self.go_backward() * 60
+        # return low_guard * 6 + fireball * 12 + drill * 8 + balayette * 18 + fireball * 12 + balayette * 18
+        return high_guard + fireball * 40 + low_guard * 2
 
 class PQuestPlayer(Player):
 
@@ -89,10 +99,14 @@ class PQuestPlayer(Player):
 
     def select_player(self):
         # Let's select MAX
+        if self.position == "P2":
+            self.frame(LEFT)
+
         self.frame(A)
+        self.frame(B)
 
     def plan_actions(self):
-        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ A]  + [NOTHING] * 2
+        fireball = [DOWN *2 , DOWN ^ self.go_forward() * 2 , self.go_forward() ^ A *2 ]  + [NOTHING] * 2
         return fireball * 36
 
 def create_app(test_config=None):
