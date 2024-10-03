@@ -19,6 +19,9 @@ class Button:
     L = "000000000010"
     R = "000000000001"
 
+def xor(b1, b2):
+    return bin(int(b1, 2) ^ int(b2, 2))
+
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -43,9 +46,12 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.post('/start')
     def start():
-        data = json.loads(list(request.form.keys())[0])
-        position = data.get("position", None)
-        game_id = data.get("game_id", None)
+        try:
+            data = request.json
+            position = data.get("position", None)
+            game_id = data.get("game_id", None)
+        except:
+            return "blabla"
         return f"I start with position {position}, game id {game_id}"
 
     @app.post('/frame/<frameid>')
@@ -54,6 +60,8 @@ def create_app(test_config=None):
         player_clock = request.headers.get("X-Player-Clock", 0)
         player_timeout = request.headers.get("X-Player-Timeout", 0)
 
-        return "".join(Button.A for _ in range(frame_count))
+        print(f"ID: {frameid}, Count: {frame_count}, clock: {player_clock}, timeout: {player_timeout}")
+
+        return xor(Button.A, Button.RIGHT)[2:].zfill(12)
 
     return app
