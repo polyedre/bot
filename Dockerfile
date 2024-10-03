@@ -1,7 +1,7 @@
 FROM python
 
-ADD main.py requirements.txt .
+ADD requirements.txt bot .
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT [ "python", "main.py" ]
+ENTRYPOINT [ "flask", "--app", "bot", "run" ]
