@@ -19,6 +19,9 @@ class Button:
     def __str__(self):
         return f"{self.name}"
 
+    def __xor__(self, b2):
+        return Button(name=f"{self.name} ^ {b2.name}", string=bin(int(self.string, 2) ^ int(b2.string, 2)).zfill(12))
+
 B       = Button(name="B"       ,string="100000000000")
 Y       = Button(name="Y"       ,string="010000000000")
 UP      = Button(name="UP"      ,string="000010000000")
@@ -38,28 +41,57 @@ class Player:
 
     def __init__(self):
         self.position = "P1"
-        self.action_count = 0
-        self.queue = [A] + [NOTHING] * 30
+        self.queue = []
 
     def set_position(self, position):
         self.position = position
+        self.dhalsim()
 
+    def dhalsim(self):
         # Let's select DHALSIM
-        if position == "P1":
-            self.queue = [DOWN]
+        if self.position == "P1":
+            self.push(DOWN)
 
-        self.queue += [RIGHT] * 3 + [A]
+        self.push(RIGHT)
+        self.push(RIGHT)
+        self.push(RIGHT)
+        self.push(A)
 
-    def get_action(self):
-        self.action_count += 1
+    def get_direction(self):
+        if self.position == "P1":
+            return RIGHT
+        return LEFT
 
+    def push(self, action: Button) -> None:
+        self.queue.append([action])
+
+    def get_action(self) -> list[Button]:
         if not self.queue:
-            self.queue.append(R)
-            self.queue.append(NOTHING)
+            # self.push(Y)
+            # self.push(NOTHING)
+            # self.push(self.get_direction())
+            # self.push(self.get_direction())
+            # self.push(NOTHING)
+
+            # self.push(R)
+            # self.push(NOTHING)
+            # self.push(NOTHING)
+            # self.push(self.get_direction())
+            # self.push(self.get_direction())
+            # self.push(NOTHING)
+
+            # Boule de feu
+            self.queue.append([DOWN, DOWN ^ RIGHT, RIGHT ^ X])
+            self.push(NOTHING)
+            self.push(NOTHING)
+            self.push(NOTHING)
+            self.push(NOTHING)
+
+            print(self.queue)
 
         return self.queue.pop(0)
 
-player = None
+player = Player()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -105,9 +137,11 @@ def create_app(test_config=None):
         player_clock = request.headers.get("X-Player-Clock", 0)
         player_timeout = request.headers.get("X-Player-Timeout", 0)
 
-        action = player.get_action()
-        print(f"ID: {frameid}, Count: {frame_count}, clock: {player_clock}, timeout: {player_timeout}, action: {action}")
+        actions = player.get_action()
+        print(actions)
+        str_actions = ", ".join([a.name for a in actions])
+        print(f"ID: {frameid}, Count: {frame_count}, clock: {player_clock}, timeout: {player_timeout}, action: {str_actions}")
 
-        return action.string
+        return "".join(action.string for action in actions)
 
     return app
