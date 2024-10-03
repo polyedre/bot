@@ -3,6 +3,7 @@
 import os
 
 import json
+import random
 from flask import Flask
 from flask import request
 
@@ -28,6 +29,7 @@ class Player:
     def __init__(self):
         self.position = "P1"
         self.action_count = 0
+        self.wait = 90
 
     def set_position(self, position):
         self.position = position
@@ -39,13 +41,20 @@ class Player:
         else:
             direction_button = Button.LEFT
 
-        # if self.action_count % 2 == 0:
-        #     action = Button.A # xor(Button.A, direction_button)[2:].zfill(12)
-        # else:
-        action = direction_button
+        if self.wait:
+            self.wait -= 1
+            return Button.NOTHING
+
+        # Wait 14 seconds that the fight starts
+        if self.action_count > 90 and self.action_count < 1600:
+            if random.random() > 0.5:
+                action = xor(Button.A, direction_button)[2:].zfill(12)
+                self.wait = 10
+            else:
+                action = direction_button
         return action
 
-player = Player()
+player = None
 
 def create_app(test_config=None):
     # create and configure the app
@@ -75,6 +84,7 @@ def create_app(test_config=None):
             data = request.json
             position = data.get("position", None)
             print(data)
+            player = Player()
             if position in ["P1", "P2"]:
                 player.position = position
             game_id = data.get("game_id", None)
