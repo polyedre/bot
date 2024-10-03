@@ -49,10 +49,10 @@ def create_app(test_config=None):
 
     @app.post('/frame/<frameid>')
     def frame(frameid: int):
-        frame_count = request.headers.get("X-Frame-Count")
-        player_clock = request.headers.get("X-Player-Clock")
-        player_timeout = request.headers.get("X-Player-Timeout")
+        frame_count = request.headers.get("X-Frame-Count", 1)
+        player_clock = request.headers.get("X-Player-Clock", 1)
+        player_timeout = request.headers.get("X-Player-Timeout", 1)
 
-        return "".join(Button.A for _ in frame_count)
+        return "".join(Button.A for _ in range(frame_count))
 
     return app
