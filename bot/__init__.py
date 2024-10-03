@@ -37,6 +37,10 @@ NOTHING = Button(name="NOTHING" ,string="000000000000")
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
 
+def split(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n))
+
 class Player:
 
     def __init__(self):
@@ -67,19 +71,6 @@ class Player:
 
     def get_action(self) -> list[Button]:
         if not self.queue:
-            # self.push(Y)
-            # self.push(NOTHING)
-            # self.push(self.get_direction())
-            # self.push(self.get_direction())
-            # self.push(NOTHING)
-
-            # self.push(R)
-            # self.push(NOTHING)
-            # self.push(NOTHING)
-            # self.push(self.get_direction())
-            # self.push(self.get_direction())
-            # self.push(NOTHING)
-
             # Boule de feu
             if self.position == "P2":
                 for _ in range(5):
@@ -91,10 +82,12 @@ class Player:
 
             # Balayaette
             if self.position == "P1":
-                for _ in range(4):
-                    self.queue.append([DOWN ^ R] + [ DOWN ] * 9)
-                    self.queue.append([DOWN] * 10)
-                    self.queue.append([DOWN] * 3)
+                cycle = [DOWN ^ R] * 10 + [ DOWN ] * 11
+
+                action = cycle * 3
+
+                for frames in split(action, 7):
+                    self.queue.append(frames)
 
             print(self.queue)
 
