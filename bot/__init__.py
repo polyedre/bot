@@ -2,6 +2,7 @@
 
 import os
 
+import json
 from flask import Flask
 from flask import request
 
@@ -42,16 +43,16 @@ def create_app(test_config=None):
     # a simple page that says hello
     @app.post('/start')
     def start():
-        data = request.json
+        data = json.loads(list(request.form.keys())[0])
         position = data.get("position", None)
         game_id = data.get("game_id", None)
         return f"I start with position {position}, game id {game_id}"
 
     @app.post('/frame/<frameid>')
     def frame(frameid: int):
-        frame_count = request.headers.get("X-Frame-Count", 1)
-        player_clock = request.headers.get("X-Player-Clock", 1)
-        player_timeout = request.headers.get("X-Player-Timeout", 1)
+        frame_count = request.headers.get("X-Frame-Count", 0)
+        player_clock = request.headers.get("X-Player-Clock", 0)
+        player_timeout = request.headers.get("X-Player-Timeout", 0)
 
         return "".join(Button.A for _ in range(frame_count))
 
