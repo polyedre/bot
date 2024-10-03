@@ -80,7 +80,8 @@ class Player:
         fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
         balayette = [DOWN ^ R] + [NOTHING] * 4
         drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
-        return fireball * 36 + drill * 4 + balayette * 18
+        low_guard = [DOWN ^ self.get_direction()] * 10
+        return low_guard * 6 + fireball * 12 + drill * 8 + balayette * 18 + fireball * 12 + balayette * 18
 
 class PQuestPlayer(Player):
 
