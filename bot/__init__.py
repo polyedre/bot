@@ -9,17 +9,27 @@ from flask import request
 
 class Button:
 
-    B       = "100000000000"
-    Y       = "010000000000"
-    UP      = "000010000000"
-    DOWN    = "000001000000"
-    LEFT    = "000000100000"
-    RIGHT   = "000000010000"
-    A       = "000000001000"
-    X       = "000000000100"
-    L       = "000000000010"
-    R       = "000000000001"
-    NOTHING = "000000000000"
+    def __init__(self, name, string):
+        self.name = name
+        self.string = string
+
+    def __repr__(self):
+        return f"{self.name}"
+
+    def __str__(self):
+        return f"{self.name}"
+
+B       = Button(name="B"       ,string="100000000000")
+Y       = Button(name="Y"       ,string="010000000000")
+UP      = Button(name="UP"      ,string="000010000000")
+DOWN    = Button(name="DOWN"    ,string="000001000000")
+LEFT    = Button(name="LEFT"    ,string="000000100000")
+RIGHT   = Button(name="RIGHT"   ,string="000000010000")
+A       = Button(name="A"       ,string="000000001000")
+X       = Button(name="X"       ,string="000000000100")
+L       = Button(name="L"       ,string="000000000010")
+R       = Button(name="R"       ,string="000000000001")
+NOTHING = Button(name="NOTHING" ,string="000000000000")
 
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
@@ -29,30 +39,25 @@ class Player:
     def __init__(self):
         self.position = "P1"
         self.action_count = 0
-        self.wait = 90
+        self.queue = [A] + [NOTHING] * 30
 
     def set_position(self, position):
         self.position = position
 
+        # Let's select DHALSIM
+        if position == "P1":
+            self.queue = [DOWN]
+
+        self.queue += [RIGHT] * 3 + [A]
+
     def get_action(self):
         self.action_count += 1
-        if self.position == "P1":
-            direction_button = Button.RIGHT
-        else:
-            direction_button = Button.LEFT
 
-        if self.wait:
-            self.wait -= 1
-            return Button.NOTHING
+        if not self.queue:
+            self.queue.append(R)
+            self.queue.append(NOTHING)
 
-        # Wait 14 seconds that the fight starts
-        if self.action_count > 90 and self.action_count < 1600:
-            if random.random() > 0.5:
-                action = xor(Button.A, direction_button)[2:].zfill(12)
-                self.wait = 10
-            else:
-                action = direction_button
-        return action
+        return self.queue.pop(0)
 
 player = None
 
@@ -84,9 +89,11 @@ def create_app(test_config=None):
             data = request.json
             position = data.get("position", None)
             print(data)
+            global player
             player = Player()
             if position in ["P1", "P2"]:
-                player.position = position
+                print(f"Setting position {position}")
+                player.set_position(position)
             game_id = data.get("game_id", None)
         except:
             return "blabla"
@@ -101,6 +108,6 @@ def create_app(test_config=None):
         action = player.get_action()
         print(f"ID: {frameid}, Count: {frame_count}, clock: {player_clock}, timeout: {player_timeout}, action: {action}")
 
-        return action
+        return action.string
 
     return app
