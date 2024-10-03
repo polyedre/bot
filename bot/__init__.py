@@ -88,7 +88,7 @@ class Player:
         # balayette = [DOWN ^ R] + [NOTHING] * 4
         # drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
         low_guard = [DOWN ^ self.go_forward()] * 10
-        high_guard = self.go_backward() * 60
+        high_guard = [self.go_backward()] * 60
         # return low_guard * 6 + fireball * 12 + drill * 8 + balayette * 18 + fireball * 12 + balayette * 18
         return high_guard + fireball * 40 + low_guard * 2
 
@@ -106,7 +106,7 @@ class PQuestPlayer(Player):
         self.frame(B)
 
     def plan_actions(self):
-        fireball = [DOWN *2 , DOWN ^ self.go_forward() * 2 , self.go_forward() ^ A *2 ]  + [NOTHING] * 2
+        fireball = [DOWN, DOWN] + [DOWN ^ self.go_forward()] * 2 + [self.go_forward() ^ A] * 2  + [NOTHING] * 2
         return fireball * 36
 
 def create_app(test_config=None):
