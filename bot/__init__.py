@@ -31,7 +31,7 @@ A       = Button(name="A"       ,string="000000001000")
 X       = Button(name="X"       ,string="000000000100")
 L       = Button(name="L"       ,string="000000000010")
 R       = Button(name="R"       ,string="000000000001")
-NOTHING = Button(name="_" ,string="000000000000")
+NOTHING = Button(name="_"       ,string="000000000000")
 
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
