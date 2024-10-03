@@ -6,8 +6,6 @@ import random
 from flask import Flask
 from flask import request
 
-game=os.environ.get("GAME", "SF")
-
 class Button:
 
     def __init__(self, name, string):
@@ -33,7 +31,7 @@ A       = Button(name="A"       ,string="000000001000")
 X       = Button(name="X"       ,string="000000000100")
 L       = Button(name="L"       ,string="000000000010")
 R       = Button(name="R"       ,string="000000000001")
-NOTHING = Button(name="_" ,string="000000000000")
+NOTHING = Button(name="_"       ,string="000000000000")
 
 def xor(b1, b2):
     return bin(int(b1, 2) ^ int(b2, 2))
@@ -82,8 +80,7 @@ class Player:
         fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
         balayette = [DOWN ^ R] + [NOTHING] * 4
         drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
-        # return fireball * 36 + drill * 4 + balayette * 18
-        return drill * 4
+        return fireball * 36 + drill * 4 + balayette * 18
 
 class PQuestPlayer(Player):
 
@@ -91,15 +88,12 @@ class PQuestPlayer(Player):
         super(Player, self).__init__()
 
     def select_player(self):
-        pass
+        # Let's select MAX
+        self.frame(A)
 
     def plan_actions(self):
         fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ A]  + [NOTHING] * 2
         return fireball * 36
-
-player = Player()
-
-print(f"THE GAME IS {game}")
 
 def create_app(test_config=None):
     # create and configure the app
@@ -111,16 +105,21 @@ def create_app(test_config=None):
         try:
             data = request.json
             position = data.get("position", None)
+            game = data.get("game", None)
+            print(f"THE GAME IS {game}")
             print(data)
             global player
-            player = Player()
+            if game == "pquest":
+                player = PQuestPlayer()
+            else:
+                player = Player()
             if position in ["P1", "P2"]:
                 print(f"Setting position {position}")
                 player.set_position(position)
             game_id = data.get("game_id", None)
         except:
             return "blabla"
-        return f"I start with position {position}, game id {game_id}"
+        return f"I start with position {position}, game is {game}, game id {game_id}"
 
     @app.post('/frame/<frameid>')
     def frame(frameid: int):
