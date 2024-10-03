@@ -79,7 +79,7 @@ class Player:
         return actions
 
     def plan_actions(self):
-        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ Y]  + [NOTHING] * 2
+        fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ X]  + [NOTHING] * 2
         balayette = [DOWN ^ R] + [NOTHING] * 4
         return fireball * 36 + balayette * 18
 
@@ -93,7 +93,6 @@ class PQuestPlayer(Player):
 
     def plan_actions(self):
         fireball = [DOWN, DOWN ^ self.get_direction(), self.get_direction() ^ A]  + [NOTHING] * 2
-        # balayette = [DOWN ^ R] + [NOTHING] * 4
         return fireball * 36
 
 player = Player()
