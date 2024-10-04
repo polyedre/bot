@@ -101,6 +101,8 @@ class PQuestPlayer(Player):
     def select_player(self):
         # Let's select MAX
         if self.position == "P2":
+            # Wait a bit when P2 because can't have 2 cursor on Max and P1 start on Max
+            [NOTHING] * 20
             self.frame(LEFT)
 
         self.frame(A)
