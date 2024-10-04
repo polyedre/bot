@@ -84,13 +84,14 @@ class Player:
         return actions
 
     def plan_actions(self):
-        fireball = [DOWN, DOWN ^ self.go_forward(), self.go_forward() ^ X]  + [NOTHING] * 2
+        fireball = [DOWN, DOWN ^ self.go_forward(), self.go_forward() ^ R]  + [NOTHING] * 42
         # balayette = [DOWN ^ R] + [NOTHING] * 4
         # drill = [UP] +  [NOTHING] * 10 + [DOWN ^ R] * 1 + [NOTHING] * 10
         low_guard = [DOWN ^ self.go_forward()] * 10
         high_guard = [self.go_backward()] * 60
+        dragonpunch = [self.go_forward(), self.go_forward() ^ DOWN, DOWN ^ self.go_forward() ^ L]  + [NOTHING] * 2
         # return low_guard * 6 + fireball * 12 + drill * 8 + balayette * 18 + fireball * 12 + balayette * 18
-        return high_guard + fireball * 40 + low_guard * 2
+        return high_guard + fireball * 2 + low_guard * 2 + dragonpunch * 2
 
 class PQuestPlayer(Player):
 
@@ -103,11 +104,19 @@ class PQuestPlayer(Player):
             self.frame(LEFT)
 
         self.frame(A)
-        self.frame(B)
 
     def plan_actions(self):
-        fireball = [DOWN, DOWN] + [DOWN ^ self.go_forward()] * 2 + [self.go_forward() ^ A] * 2  + [NOTHING] * 2
-        return fireball * 36
+        max_wavepunch = [DOWN, self.go_forward() ^ A]  + [NOTHING] * 5
+        max_uppercut = [DOWN, self.go_backward() ^ A]  + [NOTHING] * 5
+        max_piston = [self.go_forward(), DOWN ^ A]  + [NOTHING] * 5
+        return max_wavepunch * 2 + max_uppercut * 2 + max_piston * 2
+
+# 2 => BAS
+# 6 => avant
+# 4 => arriere
+# File:Max Wave Punch.png => 26x
+# File:Max Piston => 24x
+# File:Max Uppercut => 62x
 
 def create_app(test_config=None):
     # create and configure the app
