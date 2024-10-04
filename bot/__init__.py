@@ -19,7 +19,7 @@ class Button:
         return f"{self.name}"
 
     def __xor__(self, b2):
-        return Button(name=f"{self.name} ^ {b2.name}", string=bin(int(self.string, 2) ^ int(b2.string, 2)).zfill(12))
+        return Button(name=f"{self.name} ^ {b2.name}", string=bin(int(self.string, 2) ^ int(b2.string, 2))[2:].zfill(12))
 
 B       = Button(name="B"       ,string="100000000000")
 Y       = Button(name="Y"       ,string="010000000000")
